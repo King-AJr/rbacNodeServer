@@ -1,8 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const passport = require("passport");
 require ('dotenv').config()
-const employee = require("../Database/employee");
 const Employee = require("../Database/employee");
 
 /**
