@@ -2,12 +2,11 @@ const cors = require('cors');
 const express = require('express');
 const bp = require('body-parser')
 const mongoose = require('mongoose');
-const passport = require('passport')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
+//Connecting our database
 mongoose.connect(
   'mongodb+srv://KingAJ:kingaj@rbacdb.wqwubry.mongodb.net/?retryWrites=true&w=majority',
 )
@@ -17,9 +16,6 @@ mongoose.connect(
 app.use(cors());
 app.use(bp.json());
 app.use(bp.urlencoded({extended: true}))
-app.use(passport.initialize());
-
-require("./Authentication/middleware/passport")(passport);
 
 const {
   employeeAuth,
@@ -59,6 +55,7 @@ app.post("/Login-marketer", async (req, res) => {
   await employeeLogin(req.body, "marketer", res);
 });
 
+//Software engineers protected route
 app.get(
   "/se-protected",
   employeeAuth,
@@ -68,6 +65,8 @@ app.get(
   }
 );
 
+
+//Marketers protected route
 app.get(
   "/marketers-protected",
   employeeAuth,
@@ -77,6 +76,8 @@ app.get(
   }
 );
 
+
+//HR personels protected route
 app.get(
   "/hr-protected",
   employeeAuth,
