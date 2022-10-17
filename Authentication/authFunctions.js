@@ -6,7 +6,7 @@ const employee = require("../Database/employee");
 const Employee = require("../Database/employee");
 
 /**
- * @DESC To register the user (ADMIN, SUPER_ADMIN, USER)
+ * @DESC To register the user (ENGINEER, MARKETER, HR-PERSONNEL)
  */
 const employeeSignup = async (req, role, res) => {
   try {
@@ -14,7 +14,7 @@ const employeeSignup = async (req, role, res) => {
     let nameNotTaken = await validateEmployeename(req.name);
     if (!nameNotTaken) {
       return res.status(400).json({
-        message: `Employee name is already taken.`
+        message: `Employee is already registered.`
       });
     }
 
@@ -40,7 +40,7 @@ const employeeSignup = async (req, role, res) => {
       message: "Hurry! now you are successfully registred. Please nor login."
     });
   } catch (err) {
-    // Implement logger function (winston)
+    // Implement logger function if any
     return res.status(500).json({
       message: `${err.message}`
     });
@@ -48,24 +48,21 @@ const employeeSignup = async (req, role, res) => {
 };
 
 /**
- * @DESC To Login the user (ADMIN, SUPER_ADMIN, USER)
+ * @DESC To Login the user (ENGINEER, MARKETER, HR-PERSONNEL)
  */
 const employeeLogin = async (req, role, res) => {
-  //let SECRET = 'rbacsecret';
   let { name, password } = req;
   // First Check if the name is in the database
   const employee = await Employee.findOne({ name });
   if (!employee) {
     return res.status(404).json({
       message: "Employee name is not found. Invalid login credentials.",
-      success: false
     });
   }
   // We will check the role
   if (employee.role !== role) {
     return res.status(403).json({
       message: "Please make sure you are logging in from the right portal.",
-      success: false
     });
   }
   // That means user is existing and trying to signin fro the right portal
@@ -108,7 +105,7 @@ const validateEmployeename = async name => {
 };
 
 /**
- * @DESC Passport middleware
+ * @DESC Verify JWT
  */
 //const employeeAuth = passport.authenticate("jwt", { session: false });
 
@@ -147,20 +144,10 @@ const validateEmail = async email => {
   return employee ? false : true;
 };
 
-const serializeEmployee  = user => {
-  return {
-    name: employee.name,
-    email: employee.email,
-    name: employee.name,
-    updatedAt: employee.updatedAt,
-    createdAt: employee.createdAt
-  };
-};
 
 module.exports = {
   employeeAuth,
   checkRole,
   employeeLogin,
-   employeeSignup,
-  serializeEmployee 
+   employeeSignup
 };
