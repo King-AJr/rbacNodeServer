@@ -4,7 +4,7 @@ require ('dotenv').config()
 const Employee = require("../Database/employee");
 
 /**
- * @DESC To register the user (ENGINEER, MARKETER, HR-PERSONNEL)
+ * @DESC To register the employee (ENGINEER, MARKETER, HR-PERSONNEL)
  */
 const employeeSignup = async (req, role, res) => {
   try {
@@ -46,7 +46,7 @@ const employeeSignup = async (req, role, res) => {
 };
 
 /**
- * @DESC To Login the user (ENGINEER, MARKETER, HR-PERSONNEL)
+ * @DESC To Login the employee (ENGINEER, MARKETER, HR-PERSONNEL)
  */
 const employeeLogin = async (req, role, res) => {
   let { name, password } = req;
