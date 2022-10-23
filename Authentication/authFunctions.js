@@ -105,7 +105,6 @@ const validateEmployeename = async name => {
 /**
  * @DESC Verify JWT
  */
-//const employeeAuth = passport.authenticate("jwt", { session: false });
 
 const employeeAuth =   (req, res, next) => {
   const authHeader = req.headers['authorization'];
