@@ -1,92 +1,33 @@
-const cors = require('cors');
 const express = require('express');
-const bp = require('body-parser')
+const bp = require('body-parser');
+const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose');
-
+const cors = require('cors');
+const userRouter = require('./routes/userRouter')
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
 //Connecting our database
-mongoose.connect(
-  'mongodb+srv://KingAJ:kingaj@rbacdb.wqwubry.mongodb.net/?retryWrites=true&w=majority',
-)
-.then(() => {
-  console.log('MongoDB connected...');
-})
-app.use(cors());
+mongoose.connect(process.env.DB_CONNECT)
+  .then(() => {
+    console.log('MongoDB connected...');
+  })
+
 app.use(bp.json());
+app.use(cookieParser());
 app.use(bp.urlencoded({extended: true}))
 
-const {
-  employeeAuth,
-  employeeLogin,
-  checkRole,
-  employeeSignup,
-} = require("./Authentication/authFunctions");
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Credentials']
+};
 
-// Software engineering Registeration Route
-app.post("/register-se", (req, res) => {
-   employeeSignup(req.body, "se", res);
+app.use(cors(corsOptions));
+app.use('', userRouter);
+
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
-
-//Marketer Registration Route
-app.post("/register-marketer", async (req, res) => {
-  await employeeSignup(req.body, "marketer", res);
-});
-
-//Human resource Registration route
-app.post("/register-hr", async (req, res) => {
-  await employeeSignup(req.body, "hr", res);
-});
-
-
-// Software engineers Login Route
-app.post("/Login-se", async (req, res) => {
-  await employeeLogin(req.body, "se", res);
-});
-
-// Human Resource Login Route
-app.post("/Login-hr", async (req, res) => {
-  await employeeLogin(req.body, "hr", res);
-});
-
-// Marketer Login Route
-app.post("/Login-marketer", async (req, res) => {
-  await employeeLogin(req.body, "marketer", res);
-});
-
-//Software engineers protected route
-app.get(
-  "/se-protected",
-  employeeAuth,
-  checkRole(["se"]),
-  async (req, res) => {
-    return res.json(`welcome ${req.body.name}`);
-  }
-);
-
-
-//Marketers protected route
-app.get(
-  "/marketers-protected",
-  employeeAuth,
-  checkRole(["marketer"]),
-  async (req, res) => {
-    return res.json(`welcome ${req.body.name}`);
-  }
-);
-
-
-//HR personels protected route
-app.get(
-  "/hr-protected",
-  employeeAuth,
-  checkRole(["hr"]),
-  async (req, res) => {
-    return res.json(`welcome ${req.body.name}`);
-  }
-);
-
-
-
-app.listen(3000, () => console.log(`server is running on port ${PORT}`));

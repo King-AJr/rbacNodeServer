@@ -50,6 +50,7 @@ const employeeSignup = async (req, role, res) => {
  */
 const employeeLogin = async (req, role, res) => {
   let { name, password } = req;
+  console.log(name, password);
   // First Check if the name is in the database
   const employee = await Employee.findOne({ name });
   if (!employee) {
@@ -82,17 +83,24 @@ const employeeLogin = async (req, role, res) => {
       name: employee.name,
       role: employee.role,
       email: employee.email,
-      token: `Bearer ${token}`,
+      //token: `Bearer ${token}`,
       expiresIn: 168
     };
-
-    return res.status(200).json({
+    // const date = new Date();
+    // date.setHours(date.getHours() + 5);
+    // res.setHeader('set-Cookie', `jwt=${token}; Expires=${date}; HttpOnly`)
+    res.status(200).cookie('jwt', token, {
+      expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+      secure: false,
+      httpOnly: true
+    });
+    return res.json({
       ...result,
       message: "You are now logged in."
     });
   } else {
     return res.status(403).json({
-      message: "Incorrect password."
+      message: "Incorrect username or password."
     });
   }
 };
@@ -141,10 +149,29 @@ const validateEmail = async email => {
   return employee ? false : true;
 };
 
+const jwtauth = (req, res, next) => {
+  const cookies = req.cookies
+  console.log(cookies)
+  const token = cookies.jwt;
+  if (!token) {
+  return res.status(401).json("token not found");
+  }
+  try {
+    console.log("middleware is working");
+    const user = jwt.verify(token, process.env.APP_SECRET);
+    console.log(user)
+    if(user){
+      next();
+    }
+  } catch (error) {
+    return res.status(401).json("invalid token");
+  }
+}
 
 module.exports = {
   employeeAuth,
   checkRole,
   employeeLogin,
-   employeeSignup
+   employeeSignup,
+   jwtauth
 };
